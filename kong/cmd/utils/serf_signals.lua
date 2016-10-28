@@ -17,6 +17,20 @@ local serf_version_pattern = "^Serf v([%d%.]+)"
 local serf_compatible = version.set(unpack(meta._DEPENDENCIES.serf))
 local start_timeout = 5
 
+local start_template = [[
+(
+trap '
+  trap - EXIT ERR
+  kill -0 ${!} 1>/dev/null 2>&1 && kill ${!}
+  %s
+  exit
+' EXIT QUIT INT STOP TERM ERR
+%s
+wait
+) &
+disown
+]]
+
 local function check_serf_bin(kong_config)
   log.debug("checking 'serf' executable from 'serf_path' config setting")
 
@@ -72,7 +86,7 @@ function _M.start(kong_config, dao)
   log.debug("starting serf agent: %s", cmd)
 
   -- start Serf agent
-  local ok = pl_utils.execute(cmd)
+  local ok = pl_utils.execute(string.format(start_template, kong_config.serf_stop, cmd))
   if not ok then return nil end
 
   log.verbose("waiting for serf agent to be running")

@@ -222,7 +222,7 @@ describe("NGINX conf compiler", function()
       assert(prefix_handler.prepare_prefix(tmp_config))
       local identifier_2 = helpers.file.read(tmp_config.serf_node_id)
 
-      assert.equal(identifier_1, identifier_2)
+      assert.not_equal(identifier_1, identifier_2)
     end)
 
     describe("ssl", function()
