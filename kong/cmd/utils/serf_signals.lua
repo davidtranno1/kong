@@ -71,14 +71,19 @@ function _M.start(kong_config, dao)
                        ..serf_event_name.."="..kong_config.serf_event
   }, Serf.args_mt)
 
-  local cmd = string.format("nohup %s agent %s > %s 2>&1 & echo $! > %s",
+  local cmd = string.format("nohup %s agent %s > %s 2>&1 & echo ${!} > %s",
                             kong_config.serf_path, tostring(args),
                             kong_config.serf_log, kong_config.serf_pid)
 
   log.debug("starting serf agent: %s", cmd)
 
   -- start Serf agent
-  local ok = pl_utils.execute(string.format(start_template, kong_config.serf_stop, cmd))
+  local script = string.format(start_template, kong_config.serf_stop, cmd)
+  pl_file.write(kong_config.serf_start, script)
+  local ok, _, _, stderr = pl_utils.executeex("chmod +x "..kong_config.serf_start)
+  if not ok then return nil, stderr end
+
+  local ok = pl_utils.execute("/bin/bash "..kong_config.serf_start)
   if not ok then return nil end
 
   log.verbose("waiting for serf agent to be running")
@@ -90,7 +95,7 @@ function _M.start(kong_config, dao)
     ngx.sleep(0.2)
     started = kill.is_running(kong_config.serf_pid)
   until started or ngx.time() >= texp
-
+  
   if not started then
     -- time to get latest error log from serf.log
     local logs = pl_file.read(kong_config.serf_log)
