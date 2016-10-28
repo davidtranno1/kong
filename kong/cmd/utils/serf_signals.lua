@@ -71,14 +71,15 @@ function _M.start(kong_config, dao)
                        ..serf_event_name.."="..kong_config.serf_event
   }, Serf.args_mt)
 
-  local cmd = string.format("nohup %s agent %s > %s 2>&1 & echo ${!} > %s",
+  local cmd = fmt("nohup %s agent %s > %s 2>&1 & echo ${!} > %s",
                             kong_config.serf_path, tostring(args),
                             kong_config.serf_log, kong_config.serf_pid)
 
   log.debug("starting serf agent: %s", cmd)
 
   -- start Serf agent
-  local script = string.format(start_template, kong_config.serf_stop, cmd)
+  log.verbose("saving serf shell start handler to %s", kong_config.serf_stop)
+  local script = fmt(start_template, kong_config.serf_stop, cmd)
   pl_file.write(kong_config.serf_start, script)
   local ok, _, _, stderr = pl_utils.executeex("chmod +x "..kong_config.serf_start)
   if not ok then return nil, stderr end

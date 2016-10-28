@@ -119,7 +119,7 @@ describe("kong start/stop", function()
     end)
   end)
 
-  describe("Serf", function()
+  describe("#only Serf", function()
     it("starts Serf agent daemon", function()
       assert(helpers.kong_exec("start --conf "..helpers.test_conf_path))
 
@@ -138,6 +138,21 @@ describe("kong start/stop", function()
       assert.truthy(helpers.path.exists(helpers.test_conf.serf_pid))
       assert(helpers.kong_exec("stop --prefix "..helpers.test_conf.prefix))
       assert.False(helpers.path.exists(helpers.test_conf.serf_pid))
+    end)
+    it("removes node from database on forced shutdown", function()
+      assert.equal(0, helpers.dao.nodes:count())
+
+      assert(helpers.kong_exec("start --conf "..helpers.test_conf_path))
+      assert.truthy(helpers.path.exists(helpers.test_conf.serf_pid))
+      assert.equal(1, helpers.dao.nodes:count())
+
+      os.execute("pkill -9 serf")
+
+      helpers.wait_until(function()
+        return helpers.dao.nodes:count() == 0
+      end)
+
+      assert.truthy(helpers.path.exists(helpers.test_conf.serf_pid))
     end)
   end)
 
