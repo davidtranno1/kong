@@ -17,7 +17,7 @@ local fmt = string.format
 
 -- script from old services.serf module
 local event_script_template = [[
-#!/bin/sh
+#!/usr/bin/env bash
 
 PAYLOAD=`cat` # Read from stdin
 if [ "$SERF_EVENT" != "user" ]; then
@@ -42,7 +42,7 @@ client:request { \
 ]]
 
 local stop_script_template = [[
-#!/bin/sh
+#!/usr/bin/env bash
 
 CMD="\
 local conf_loader = require 'kong.conf_loader' \
