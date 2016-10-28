@@ -1,0 +1,19 @@
+==> Starting Serf agent...
+==> Starting Serf agent RPC...
+==> Serf agent running!
+         Node name: 'sinzone.local'
+         Bind addr: '0.0.0.0:7946'
+          RPC addr: '127.0.0.1:7373'
+         Encrypted: false
+          Snapshot: false
+           Profile: lan
+
+==> Log data will now stream in as it occurs:
+
+    2016/10/27 23:08:29 [INFO] agent: Serf agent starting
+    2016/10/27 23:08:29 [INFO] serf: EventMemberJoin: sinzone.local 127.0.0.1
+    2016/10/27 23:08:30 [INFO] agent: Received event: member-join
+==> Caught signal: terminated
+    2016/10/27 23:08:34 [INFO] agent: requesting serf shutdown
+    2016/10/27 23:08:34 [WARN] serf: Shutdown without a Leave
+    2016/10/27 23:08:34 [INFO] agent: shutdown complete
